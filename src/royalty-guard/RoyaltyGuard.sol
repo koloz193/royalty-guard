@@ -115,10 +115,6 @@ abstract contract RoyaltyGuard is IRoyaltyGuard, ERC165 {
     return list[listType].contains(_operator);
   }
 
-  /// @dev used in the {onlyAdmin} modifier
-  /// @inheritdoc IRoyaltyGuard
-  function hasAdminPermission(address _addr) public view virtual returns (bool);
-
   /// @inheritdoc IRoyaltyGuard
   function getListType() external view returns (IRoyaltyGuard.ListType) {
     return listType;
@@ -128,6 +124,10 @@ abstract contract RoyaltyGuard is IRoyaltyGuard, ERC165 {
   function getDeadmanTriggerAvailableDatetime() external view returns (uint256) {
     return deadmanListTriggerAfterDatetime;
   }
+
+  /// @dev used in the {onlyAdmin} modifier
+  /// @inheritdoc IRoyaltyGuard
+  function hasAdminPermission(address _addr) public view virtual returns (bool);
 
   /*//////////////////////////////////////////////////////////////////////////
                           ERC165 Overrides
