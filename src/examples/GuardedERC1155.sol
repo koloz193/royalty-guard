@@ -14,6 +14,7 @@ contract GuardedERC1155 is ERC1155, Owned, RoyaltyGuard {
   string private baseURI;
   string private name_;
   string private symbol_;
+  uint256 private tokenIdCounter;
 
   /*//////////////////////////////////////////////////////////////////////////
                               CONSTRUCTOR
@@ -43,6 +44,19 @@ contract GuardedERC1155 is ERC1155, Owned, RoyaltyGuard {
   /// @return symbol of contract
   function symbol() external view returns (string memory) {
     return symbol_;
+  }
+
+  /// @notice Create a new token sending the full {_amount} to {_to}.
+  /// @dev Must be contract owner to mint new token.
+  function mint(address _to, uint256 _amount) external onlyOwner{
+    _mint(_to, tokenIdCounter++, _amount, "");
+  }
+
+  /// @notice Destroy {_amount} of token with id {_id}.
+  /// @dev Must have a balance >= {_amount} of {_tokenId}.
+  function burn(address _from, uint256 _id, uint256 _amount) external {
+    if (balanceOf[_from][_id] < _amount) revert("INSUFFICIENT BALANCE");
+    _burn(_from, _id, _amount);
   }
 
   /*//////////////////////////////////////////////////////////////////////////

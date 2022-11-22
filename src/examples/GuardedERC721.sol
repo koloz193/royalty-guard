@@ -12,6 +12,7 @@ contract GuardedERC721 is ERC721, Owned, RoyaltyGuard {
                               PRIVATE STORAGE
   //////////////////////////////////////////////////////////////////////////*/
   string private baseURI;
+  uint256 private tokenCounter;
 
   /*//////////////////////////////////////////////////////////////////////////
                               CONSTRUCTOR
@@ -26,8 +27,25 @@ contract GuardedERC721 is ERC721, Owned, RoyaltyGuard {
   /*//////////////////////////////////////////////////////////////////////////
                               ERC721 LOGIC
   //////////////////////////////////////////////////////////////////////////*/
+  
+  /// @notice Retrieve the tokenURI for a token with the supplied _id
+  /// @dev Wont throw or revert given a nonexistent tokenId
+  /// @return string token uri
   function tokenURI(uint256 _id) public view virtual override returns (string memory) {
     return string(abi.encodePacked(baseURI, _id));
+  }
+
+  /// @notice Create a new token sending directly to {_to}.
+  /// @dev Must be contract owner to mint new token.
+  function mint(address _to) external onlyOwner {
+    _mint(_to, tokenCounter++);
+  }
+
+  /// @notice Destroy token with id {_id}.
+  /// @dev Must be the token owner to call.
+  function burn(uint256 _id) external {
+    if (_ownerOf[_id] != msg.sender) revert("NOT_OWNER");
+    _burn(_id);
   }
 
   /*//////////////////////////////////////////////////////////////////////////
