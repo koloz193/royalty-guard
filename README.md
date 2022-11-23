@@ -1,6 +1,6 @@
 # RoyaltyGuard
 
-A general mixin for any owned/permissioned nft contract that allows for fine tuning permissions based off an ALLOW or DENY list. The best example of a use case at this point in time is the enforcement of royalty payouts through selecting which platforms are/arent allowed to move tokens on a users behalf. The implementation used here supports a list being ALLOW/DENY/OFF, with a default setting of OFF.
+A general mixin for any owned/permissioned nft contract that allows for fine tuning guards based off an ALLOW or DENY list. The best example of a use case at this point in time is the enforcement of royalty payouts through selecting which platforms are/arent allowed to move tokens on a users behalf. The implementation used here supports a list being ALLOW/DENY/OFF, with a default setting of OFF.
 
 ## Contracts
 
