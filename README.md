@@ -39,6 +39,8 @@ The minimal changes needed are inherit the `RoyaltyGuard` Contract, override `ER
 
 Example setups can be found in [GuardedERC721](src/example/GuardedERC721.sol) and [GuardedERC1155](src/example/GuardedERC1155.sol).
 
+For more advance setups, a set of internal functions is supplied that can be used for the purpose of setup within a contracts constructor. See [RoyaltyGuard](src/royalty-guard/RoyaltyGuard.sol).
+
 ## Usage
 Guarded functions are those that are marked with the modifier `checkList(address _addr)` that checks the list type and changes based on the typing. 
 

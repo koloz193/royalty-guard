@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: MIT
-
 pragma solidity 0.8.15;
 
 import {IRoyaltyGuard} from "./IRoyaltyGuard.sol";
@@ -52,8 +51,7 @@ abstract contract RoyaltyGuard is IRoyaltyGuard, ERC165 {
   /// @dev Only the contract owner can call this function.
   /// @inheritdoc IRoyaltyGuard
   function toggleListType(IRoyaltyGuard.ListType _newListType) external onlyAdmin {
-    emit ListTypeUpdated(msg.sender, listType, _newListType);
-    listType = _newListType;
+    _setListType(_newListType);
   }
 
   /// @dev Only the contract owner can call this function.
@@ -61,27 +59,19 @@ abstract contract RoyaltyGuard is IRoyaltyGuard, ERC165 {
   /// @inheritdoc IRoyaltyGuard
   function batchAddAddressToRoyaltyList(IRoyaltyGuard.ListType _listType, address[] calldata _addrs) external onlyAdmin {
     if (_listType == IRoyaltyGuard.ListType.OFF) revert IRoyaltyGuard.CantAddToOFFList();
-    for (uint256 i = 0; i < _addrs.length; i++) {
-      list[_listType].add(_addrs[i]);
-      emit AddressAddedToList(msg.sender, _addrs[i], _listType);
-    }
+    _batchUpdateList(_listType, _addrs, true);
   }
 
   /// @dev Only the contract owner can call this function.
   /// @inheritdoc IRoyaltyGuard
   function batchRemoveAddressToRoyaltyList(IRoyaltyGuard.ListType _listType, address[] calldata _addrs) external onlyAdmin {
-    for (uint256 i = 0; i < _addrs.length; i++) {
-      list[_listType].remove(_addrs[i]);
-      emit AddressRemovedList(msg.sender, _addrs[i], _listType);
-    }
+    _batchUpdateList(_listType, _addrs, false);
   }
 
   /// @dev Only the contract owner can call this function.
   /// @inheritdoc IRoyaltyGuard
   function setDeadmanListTriggerDatetime(uint256 _numYears) external onlyAdmin {
-    uint256 newDatetime = block.timestamp + _numYears * 365 days;
-    emit DeadmanTriggerDatetimeUpdated(msg.sender, deadmanListTriggerAfterDatetime, newDatetime);
-    deadmanListTriggerAfterDatetime = newDatetime;
+    _setDeadmanTriggerDatetime(_numYears);
   }
 
   /// @dev Only the contract owner can call this function.
@@ -144,4 +134,36 @@ abstract contract RoyaltyGuard is IRoyaltyGuard, ERC165 {
   function supportsInterface(bytes4 _interfaceId) public view virtual override returns (bool) {
         return _interfaceId == type(IRoyaltyGuard).interfaceId || super.supportsInterface(_interfaceId);
     }
+
+  /*//////////////////////////////////////////////////////////////////////////
+                            Internal Functions
+  //////////////////////////////////////////////////////////////////////////*/
+  
+  /// @dev Internal method to set list type. Main usage is constructor.
+  function _setListType(IRoyaltyGuard.ListType _newListType) internal {
+    emit ListTypeUpdated(msg.sender, listType, _newListType);
+    listType = _newListType;
+  }
+
+  /// @dev Internal method to update a certain list. Main usage is constructor.
+  function _batchUpdateList(IRoyaltyGuard.ListType _listType, address[] memory _addrs, bool _onList) internal {
+    if (_listType != IRoyaltyGuard.ListType.OFF) {
+      for (uint256 i = 0; i < _addrs.length; i++) {
+        if (_onList) {
+          list[_listType].add(_addrs[i]);
+          emit AddressAddedToList(msg.sender, _addrs[i], _listType);
+        } else {
+          list[_listType].remove(_addrs[i]);
+          emit AddressRemovedList(msg.sender, _addrs[i], _listType);
+        }
+      }
+    }
+  }
+
+  /// @dev Internal method to set deadman trigger datetime. Main usage is constructor.
+  function _setDeadmanTriggerDatetime(uint256 _numYears) internal {
+    uint256 newDatetime = block.timestamp + _numYears * 365 days;
+    emit DeadmanTriggerDatetimeUpdated(msg.sender, deadmanListTriggerAfterDatetime, newDatetime);
+    deadmanListTriggerAfterDatetime = newDatetime;
+  }
 }
