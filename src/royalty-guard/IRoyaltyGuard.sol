@@ -75,7 +75,7 @@ interface IRoyaltyGuard {
 
   /// @notice Sets the deadman list trigger for the specified number of years from current block timestamp
   /// @param _numYears to renew the trigger for.
-  function setDeadmanListTriggerDatetime(uint256 _numYears) external;
+  function setDeadmanListTriggerRenewalDuration(uint256 _numYears) external;
 
   /// @notice Clears an entire list.
   /// @param _listType of list being cleared.

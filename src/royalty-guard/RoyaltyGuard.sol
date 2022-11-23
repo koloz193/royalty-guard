@@ -70,8 +70,8 @@ abstract contract RoyaltyGuard is IRoyaltyGuard, ERC165 {
 
   /// @dev Only the contract owner can call this function.
   /// @inheritdoc IRoyaltyGuard
-  function setDeadmanListTriggerDatetime(uint256 _numYears) external onlyAdmin {
-    _setDeadmanTriggerDatetime(_numYears);
+  function setDeadmanListTriggerRenewalDuration(uint256 _numYears) external onlyAdmin {
+    _setDeadmanTriggerRenewalInYears(_numYears);
   }
 
   /// @dev Only the contract owner can call this function.
@@ -161,7 +161,7 @@ abstract contract RoyaltyGuard is IRoyaltyGuard, ERC165 {
   }
 
   /// @dev Internal method to set deadman trigger datetime. Main usage is constructor.
-  function _setDeadmanTriggerDatetime(uint256 _numYears) internal {
+  function _setDeadmanTriggerRenewalInYears(uint256 _numYears) internal {
     uint256 newDatetime = block.timestamp + _numYears * 365 days;
     emit DeadmanTriggerDatetimeUpdated(msg.sender, deadmanListTriggerAfterDatetime, newDatetime);
     deadmanListTriggerAfterDatetime = newDatetime;

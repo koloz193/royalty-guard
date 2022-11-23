@@ -48,7 +48,7 @@ The list type can be updated via `toggleListType(ListType _newListType)` which r
 
 Adding, removing, and clearing a list also rely on `hasAdminPermission(address _addr) returns (bool)`. The relevant functions here are `batchAddAddressToRoyaltyList(ListType _listType, address[] _addrs)`, `batchRemoveAddressToRoyaltyList(ListType _listType, address[] _addrs)`, and `clearList(ListType _listType)`. 
 
-The two deadman trigger functions are `setDeadmanListTriggerDatetime(uint256 _numYears)`, another admin guarded function, that renews the deadman switch for `_numYears` years and `activateDeadmanListTrigger()`, a public function, used to turn the list type to `OFF` and is only callable when the current `block.timestamp` is on or after the returned value from `getDeadmanTriggerAvailableDatetime()`.
+The two deadman trigger functions are `setDeadmanListTriggerRenewalDuration(uint256 _numYears)`, another admin guarded function, that renews the deadman switch for `_numYears` years and `activateDeadmanListTrigger()`, a public function, used to turn the list type to `OFF` and is only callable when the current `block.timestamp` is on or after the returned value from `getDeadmanTriggerAvailableDatetime()`.
 
 ## Installation
 
