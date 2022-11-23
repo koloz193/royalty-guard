@@ -52,6 +52,7 @@ abstract contract RoyaltyGuard is IRoyaltyGuard, ERC165 {
   /// @dev Only the contract owner can call this function.
   /// @inheritdoc IRoyaltyGuard
   function toggleListType(IRoyaltyGuard.ListType _newListType) external onlyAdmin {
+    emit ListTypeUpdated(msg.sender, listType, _newListType);
     listType = _newListType;
   }
 
@@ -62,6 +63,7 @@ abstract contract RoyaltyGuard is IRoyaltyGuard, ERC165 {
     if (_listType == IRoyaltyGuard.ListType.OFF) revert IRoyaltyGuard.CantAddToOFFList();
     for (uint256 i = 0; i < _addrs.length; i++) {
       list[_listType].add(_addrs[i]);
+      emit AddressAddedToList(msg.sender, _addrs[i], _listType);
     }
   }
 
@@ -70,19 +72,23 @@ abstract contract RoyaltyGuard is IRoyaltyGuard, ERC165 {
   function batchRemoveAddressToRoyaltyList(IRoyaltyGuard.ListType _listType, address[] calldata _addrs) external onlyAdmin {
     for (uint256 i = 0; i < _addrs.length; i++) {
       list[_listType].remove(_addrs[i]);
+      emit AddressRemovedList(msg.sender, _addrs[i], _listType);
     }
   }
 
   /// @dev Only the contract owner can call this function.
   /// @inheritdoc IRoyaltyGuard
   function setDeadmanListTriggerDatetime(uint256 _numYears) external onlyAdmin {
-    deadmanListTriggerAfterDatetime = block.timestamp + _numYears * 365 days;
+    uint256 newDatetime = block.timestamp + _numYears * 365 days;
+    emit DeadmanTriggerDatetimeUpdated(msg.sender, deadmanListTriggerAfterDatetime, newDatetime);
+    deadmanListTriggerAfterDatetime = newDatetime;
   }
 
   /// @dev Only the contract owner can call this function.
   /// @inheritdoc IRoyaltyGuard
   function clearList(IRoyaltyGuard.ListType _listType) external onlyAdmin {
     delete list[_listType];
+    emit ListCleared(msg.sender, _listType);
   }
 
   /*//////////////////////////////////////////////////////////////////////////
@@ -94,6 +100,7 @@ abstract contract RoyaltyGuard is IRoyaltyGuard, ERC165 {
   function activateDeadmanListTrigger() external {
     if (deadmanListTriggerAfterDatetime > block.timestamp) revert IRoyaltyGuard.DeadmanTriggerStillActive();
     listType = IRoyaltyGuard.ListType.OFF;
+    emit DeadmanTriggerActivated(msg.sender);
   }
 
   /*//////////////////////////////////////////////////////////////////////////

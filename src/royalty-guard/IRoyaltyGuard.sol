@@ -19,6 +19,28 @@ interface IRoyaltyGuard {
     }
 
   /*//////////////////////////////////////////////////////////////////////////
+                            Events
+  //////////////////////////////////////////////////////////////////////////*/
+
+  /// @notice Emitted when the list type is updated.
+  event ListTypeUpdated(address indexed _updater, ListType indexed _oldListType, ListType indexed _newListType);
+
+  /// @notice Emitted when an address is added to a list.
+  event AddressAddedToList(address indexed _updater, address indexed _addedAddr, ListType indexed _ListType);
+
+  /// @notice Emitted when an address is removed from a list.
+  event AddressRemovedList(address indexed _updater, address indexed _removedAddr, ListType indexed _ListType);
+
+  /// @notice Emitted when deadman trigger datetime has been updated.
+  event DeadmanTriggerDatetimeUpdated(address indexed _updater, uint256 _oldDatetime, uint256 _newDatetime);
+
+  /// @notice Emitted when a list is cleared.
+  event ListCleared(address indexed _updater, ListType _listType);
+
+  /// @notice Emitted when the deadman switch is activated.
+  event DeadmanTriggerActivated(address indexed _activator);
+
+  /*//////////////////////////////////////////////////////////////////////////
                           Custom Errors
   //////////////////////////////////////////////////////////////////////////*/
 
