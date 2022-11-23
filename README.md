@@ -35,7 +35,7 @@ While there are other ways to integrate with `RoyaltyGuard`, these examples use 
 
 The end result of this is the `RoyaltyGuard` integrated into a contract with type `OFF`, deadman trigger set to 0, all lists empty, and marked functions guarded by the `hasAdminPermission` function.
 
-The minimal changes needed are (1) inherit the `RoyaltyGuard` Contract, override `ERC165`'s `supportsInterface`, implement `hasAdminPermission`, and attach the `checkList` to any functions that need guarding.
+The minimal changes needed are inherit the `RoyaltyGuard` Contract, override `ERC165`'s `supportsInterface`, implement `hasAdminPermission`, and attach the `checkList` to any functions that need guarding.
 
 Example setups can be found in [GuardedERC721](src/example/GuardedERC721.sol) and [GuardedERC1155](src/example/GuardedERC1155.sol).
 
