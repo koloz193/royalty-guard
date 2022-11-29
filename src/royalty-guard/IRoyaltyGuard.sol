@@ -30,14 +30,8 @@ interface IRoyaltyGuard {
   /// @notice Emitted when an address is removed from a list.
   event AddressRemovedList(address indexed _updater, address indexed _removedAddr, ListType indexed _ListType);
 
-  /// @notice Emitted when deadman trigger datetime has been updated.
-  event DeadmanTriggerDatetimeUpdated(address indexed _updater, uint256 _oldDatetime, uint256 _newDatetime);
-
   /// @notice Emitted when a list is cleared.
   event ListCleared(address indexed _updater, ListType _listType);
-
-  /// @notice Emitted when the deadman switch is activated.
-  event DeadmanTriggerActivated(address indexed _activator);
 
   /*//////////////////////////////////////////////////////////////////////////
                           Custom Errors
@@ -48,9 +42,6 @@ interface IRoyaltyGuard {
 
   /// @notice Emitted when trying to add an address to a list with type OFF.
   error CantAddToOFFList();
-
-  /// @notice Emitted when the deadman trigger datetime threshold hasnt passed but tries to get called.
-  error DeadmanTriggerStillActive();
 
   /// @notice Emitted when an admin only function tries to be called by a non-admin.
   error MustBeAdmin();
@@ -73,16 +64,9 @@ interface IRoyaltyGuard {
   /// @param _addrs being removed from the designated list
   function batchRemoveAddressToRoyaltyList(IRoyaltyGuard.ListType _listType, address[] calldata _addrs) external;
 
-  /// @notice Sets the deadman list trigger for the specified number of years from current block timestamp
-  /// @param _numYears to renew the trigger for.
-  function setDeadmanListTriggerRenewalDuration(uint256 _numYears) external;
-
   /// @notice Clears an entire list.
   /// @param _listType of list being cleared.
   function clearList(IRoyaltyGuard.ListType _listType) external;
-
-  /// @notice Triggers the deadman switch for the list
-  function activateDeadmanListTrigger() external;
 
   /*//////////////////////////////////////////////////////////////////////////
                           External Read Functions
@@ -110,8 +94,4 @@ interface IRoyaltyGuard {
   /// @notice Returns the ListType currently being used;
   /// @return ListType of the list. Values are: 0 (OFF), 1 (ALLOW), 2 (DENY)
   function getListType() external view returns (ListType);
-
-  /// @notice The datetime threshold after which the deadman trigger can be called by anyone.
-  /// @return uint256 denoting unix epoch time after which the deadman trigger can be activated.
-  function getDeadmanTriggerAvailableDatetime() external view returns (uint256);
 }
