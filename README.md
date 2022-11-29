@@ -8,11 +8,11 @@ A general mixin for any owned/permissioned nft contract that allows for fine tun
 royalty-guard
 ├─ RoyaltyGuard — "Admin controlled ALLOW/DENY list primitives"
 ├─ extensions
-|  ├─ RoyaltyGuardDeadmanTrigger - "RoyaltyGuard with a renewable deadman switch to turn list off after predefined period of time"
+│  ├─ RoyaltyGuardDeadmanTrigger - "RoyaltyGuard with a renewable deadman switch to turn list off after predefined period of time"
 examples
 ├─ deadman-trigger
-|  ├─ DeadmanGuardedERC721 - "GuardedERC721 with the deadman trigger extension"
-|  ├─ DeadmanGuardedERC1155 - "GuardedERC1155 with the deadman trigger extension"
+│  ├─ DeadmanGuardedERC721 - "GuardedERC721 with the deadman trigger extension"
+│  ├─ DeadmanGuardedERC1155 - "GuardedERC1155 with the deadman trigger extension"
 ├─ GuardedERC721 — "Solmate based ERC721 with Owner restrictions and RoyaltyGuard"
 ├─ GuardedERC1155 — "Solmate based ERC1155 with Owner restrictionsand RoyaltyGuard"
 ```
