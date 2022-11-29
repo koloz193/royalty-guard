@@ -19,7 +19,6 @@ abstract contract RoyaltyGuard is IRoyaltyGuard, ERC165 {
 
   mapping(IRoyaltyGuard.ListType => EnumerableSet.AddressSet) private list;
   IRoyaltyGuard.ListType private listType;
-  uint256 public deadmanListTriggerAfterDatetime;
 
   /*//////////////////////////////////////////////////////////////////////////
                                 Modifiers
@@ -50,47 +49,29 @@ abstract contract RoyaltyGuard is IRoyaltyGuard, ERC165 {
 
   /// @dev Only the contract owner can call this function.
   /// @inheritdoc IRoyaltyGuard
-  function toggleListType(IRoyaltyGuard.ListType _newListType) external onlyAdmin {
+  function toggleListType(IRoyaltyGuard.ListType _newListType) external virtual onlyAdmin {
     _setListType(_newListType);
   }
 
   /// @dev Only the contract owner can call this function.
   /// @dev Cannot add to the OFF list
   /// @inheritdoc IRoyaltyGuard
-  function batchAddAddressToRoyaltyList(IRoyaltyGuard.ListType _listType, address[] calldata _addrs) external onlyAdmin {
+  function batchAddAddressToRoyaltyList(IRoyaltyGuard.ListType _listType, address[] calldata _addrs) external virtual onlyAdmin {
     if (_listType == IRoyaltyGuard.ListType.OFF) revert IRoyaltyGuard.CantAddToOFFList();
     _batchUpdateList(_listType, _addrs, true);
   }
 
   /// @dev Only the contract owner can call this function.
   /// @inheritdoc IRoyaltyGuard
-  function batchRemoveAddressToRoyaltyList(IRoyaltyGuard.ListType _listType, address[] calldata _addrs) external onlyAdmin {
+  function batchRemoveAddressToRoyaltyList(IRoyaltyGuard.ListType _listType, address[] calldata _addrs) external virtual onlyAdmin {
     _batchUpdateList(_listType, _addrs, false);
   }
 
   /// @dev Only the contract owner can call this function.
   /// @inheritdoc IRoyaltyGuard
-  function setDeadmanListTriggerRenewalDuration(uint256 _numYears) external onlyAdmin {
-    _setDeadmanTriggerRenewalInYears(_numYears);
-  }
-
-  /// @dev Only the contract owner can call this function.
-  /// @inheritdoc IRoyaltyGuard
-  function clearList(IRoyaltyGuard.ListType _listType) external onlyAdmin {
+  function clearList(IRoyaltyGuard.ListType _listType) external virtual onlyAdmin {
     delete list[_listType];
     emit ListCleared(msg.sender, _listType);
-  }
-
-  /*//////////////////////////////////////////////////////////////////////////
-                          Public Write Functions
-  //////////////////////////////////////////////////////////////////////////*/
-
-  /// @dev Can only be called if deadmanListTriggerAfterDatetime is in the past.
-  /// @inheritdoc IRoyaltyGuard
-  function activateDeadmanListTrigger() external {
-    if (deadmanListTriggerAfterDatetime > block.timestamp) revert IRoyaltyGuard.DeadmanTriggerStillActive();
-    listType = IRoyaltyGuard.ListType.OFF;
-    emit DeadmanTriggerActivated(msg.sender);
   }
 
   /*//////////////////////////////////////////////////////////////////////////
@@ -98,40 +79,35 @@ abstract contract RoyaltyGuard is IRoyaltyGuard, ERC165 {
   //////////////////////////////////////////////////////////////////////////*/
 
   /// @inheritdoc IRoyaltyGuard
-  function getList(IRoyaltyGuard.ListType _listType) external view returns (address[] memory) {
+  function getList(IRoyaltyGuard.ListType _listType) external virtual view returns (address[] memory) {
     return list[_listType].values();
   }
 
   /// @inheritdoc IRoyaltyGuard
-  function getInUseList() external view returns (address[] memory) {
+  function getInUseList() external virtual view returns (address[] memory) {
     return list[listType].values();
   }
 
   /// @inheritdoc IRoyaltyGuard
-  function isOperatorInList(address _operator) external view returns (bool) {
+  function isOperatorInList(address _operator) external virtual view returns (bool) {
     return list[listType].contains(_operator);
   }
 
   /// @inheritdoc IRoyaltyGuard
-  function getListType() external view returns (IRoyaltyGuard.ListType) {
+  function getListType() external virtual view returns (IRoyaltyGuard.ListType) {
     return listType;
-  }
-
-  /// @inheritdoc IRoyaltyGuard
-  function getDeadmanTriggerAvailableDatetime() external view returns (uint256) {
-    return deadmanListTriggerAfterDatetime;
   }
 
   /// @dev used in the {onlyAdmin} modifier
   /// @inheritdoc IRoyaltyGuard
-  function hasAdminPermission(address _addr) public view virtual returns (bool);
+  function hasAdminPermission(address _addr) public virtual view returns (bool);
 
   /*//////////////////////////////////////////////////////////////////////////
                           ERC165 Overrides
   //////////////////////////////////////////////////////////////////////////*/
 
   /// @inheritdoc ERC165
-  function supportsInterface(bytes4 _interfaceId) public view virtual override returns (bool) {
+  function supportsInterface(bytes4 _interfaceId) public virtual view override returns (bool) {
         return _interfaceId == type(IRoyaltyGuard).interfaceId || super.supportsInterface(_interfaceId);
     }
 
@@ -158,12 +134,5 @@ abstract contract RoyaltyGuard is IRoyaltyGuard, ERC165 {
         }
       }
     }
-  }
-
-  /// @dev Internal method to set deadman trigger datetime. Main usage is constructor.
-  function _setDeadmanTriggerRenewalInYears(uint256 _numYears) internal {
-    uint256 newDatetime = block.timestamp + _numYears * 365 days;
-    emit DeadmanTriggerDatetimeUpdated(msg.sender, deadmanListTriggerAfterDatetime, newDatetime);
-    deadmanListTriggerAfterDatetime = newDatetime;
   }
 }

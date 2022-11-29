@@ -7,7 +7,12 @@ A general mixin for any owned/permissioned nft contract that allows for fine tun
 ```ml
 royalty-guard
 ├─ RoyaltyGuard — "Admin controlled ALLOW/DENY list primitives"
+├─ extensions
+|  ├─ RoyaltyGuardDeadmanTrigger - "RoyaltyGuard with a renewable deadman switch to turn list off after predefined period of time"
 examples
+├─ deadman-trigger
+|  ├─ DeadmanGuardedERC721 - "GuardedERC721 with the deadman trigger extension"
+|  ├─ DeadmanGuardedERC1155 - "GuardedERC1155 with the deadman trigger extension"
 ├─ GuardedERC721 — "Solmate based ERC721 with Owner restrictions and RoyaltyGuard"
 ├─ GuardedERC1155 — "Solmate based ERC1155 with Owner restrictionsand RoyaltyGuard"
 ```
@@ -23,11 +28,17 @@ We **do not give any warranties** and **will not be liable for any loss** incurr
 `RoyaltyGuard` is an abstract contract that is meant to be inherrited to integrate with a contract. The main features of the contract are:
 1. Configurable list type with options `OFF`, `ALLOW`, and `DENY`.
 2. Flexible admin permissioning of Guard (note examples use `Owner` based permissioning but can leave it to anyone, `ROLE` based, etc.)
-3. Deadman Trigger Support
-    - If the owner/permissioning group hasn't renewed the trigger, anyone can come in and activate the deadman trigger turning the list type to `OFF`
-    - Even after deadman trigger has been activated, the owner/permissioning group can renew and change the list type to `ALLOW` or `DENY`.
 
 The two different active list types are `ALLOW` and `DENY`. In the `ALLOW` model, functions marked with the `checkList` modifier will `revert` with `Unauthorized` unless the supplied address is on the list. The `DENY` list takes the opposite approach and will `revert` if and only if the supplied address is on the list.
+
+### Extensions
+
+#### Deadman Trigger
+  If the owner/permissioning group hasn't renewed the trigger, anyone can come in and activate the deadman trigger turning the list type to `OFF`. Even after deadman trigger has been activated, the owner/permissioning group can renew and change the list type to `ALLOW` or `DENY`.
+
+  The two deadman trigger functions are `setDeadmanListTriggerRenewalDuration(uint256 _numYears)`, another admin guarded function, that renews the deadman switch for `_numYears` years and `activateDeadmanListTrigger()`, a public function, used to turn the list type to `OFF` and is only callable when the current `block.timestamp` is on or after the returned value from `getDeadmanTriggerAvailableDatetime()`.
+
+  Source code at [RoyaltyGuardDeadmanTrigger](src/royalty-guard/extensions/RoyaltyGuardDeadmanTrigger.sol) with [examples](src/example/deadman-trigger/).
 
 ## How to Integrate
 
@@ -42,13 +53,12 @@ Example setups can be found in [GuardedERC721](src/example/GuardedERC721.sol) an
 For more advance setups, a set of internal functions is supplied that can be used for the purpose of setup within a contracts constructor. See [RoyaltyGuard](src/royalty-guard/RoyaltyGuard.sol).
 
 ## Usage
+
 Guarded functions are those that are marked with the modifier `checkList(address _addr)` that checks the list type and changes based on the typing. 
 
 The list type can be updated via `toggleListType(ListType _newListType)` which relies on the implemented function `hasAdminPermission(address _addr) returns (bool)`. The examples leverage use of an `Owner` to guard access. Valid inputs for `ListType` are `0` for OFF, `1` for ALLOW, and `2` for DENY. 
 
 Adding, removing, and clearing a list also rely on `hasAdminPermission(address _addr) returns (bool)`. The relevant functions here are `batchAddAddressToRoyaltyList(ListType _listType, address[] _addrs)`, `batchRemoveAddressToRoyaltyList(ListType _listType, address[] _addrs)`, and `clearList(ListType _listType)`. 
-
-The two deadman trigger functions are `setDeadmanListTriggerRenewalDuration(uint256 _numYears)`, another admin guarded function, that renews the deadman switch for `_numYears` years and `activateDeadmanListTrigger()`, a public function, used to turn the list type to `OFF` and is only callable when the current `block.timestamp` is on or after the returned value from `getDeadmanTriggerAvailableDatetime()`.
 
 ## Installation
 
